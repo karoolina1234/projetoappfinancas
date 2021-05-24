@@ -5,13 +5,34 @@ export const AuthContext = createContext({});
 
 function AuthProvider({ children }){
     const [user, setUser] = useState(null);
+
+    //Função para Logar usuário
+        async function signIn(email, password){
+            await firebase.auth().signInWithEmailAndPassword(email, password)
+            .then(async (value)=>{
+                let uid = value.user.uid;
+                await firebase.database().ref('users').child(uid).once('value')
+                .then((snapshot)=>{
+                    let data = {
+                        uid: uid,
+                        nome: snapshot.val().nome, 
+                        email: value.user.email,
+                    }
+                    setUser(data)
+                })
+            })
+            .catch((error)=>{
+                alert(error.code)
+            })
+        }
+
     
     //Cadastrar usuario
     async function signUp(email, password, nome){
         await firebase.auth().createUserWithEmailAndPassword(email,password)
         .then(async (value)=>{
             let uid = value.user.uid;
-            await firebase.database().ref('users').child(uid).set({
+            await firebase.database().ref('users').child(uid).set({ //aqui ele gera os dados referentes ao usuario para a database
                 saldo: 0,
                 nome: nome
             })
@@ -27,7 +48,7 @@ function AuthProvider({ children }){
     }
 
     return(
-     <AuthContext.Provider value={{ signed: !!user , user, signUp }}>
+     <AuthContext.Provider value={{ signed: !!user , user, signUp, signIn}}>
          {children}
      </AuthContext.Provider>   
     );
