@@ -22,12 +22,12 @@ const Home = () => {
     <Background>
       <Header />
       <Container>
-        <Nome>Fulano</Nome>
-        <Saldo>100</Saldo>
+        <Nome>{user && user.nome}</Nome>
+        <Saldo>0</Saldo>
       </Container>
       <Title>movimentações</Title>
       <List
-      showVerticalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
       data={historico}
       keyExtractor={item => item.key}
       renderItem={({item})=>(<HistoricoList data={item}/>)}/>
