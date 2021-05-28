@@ -1,7 +1,7 @@
 import React from 'react';
 import {Picker as RNPickerSelect} from '@react-native-picker/picker'
 import {PickerView} from './styles'
-const Picker = ({onchange, tipo}) => {
+const Picker = ({onChange, tipo}) => {
   return (
       <PickerView>
           <RNPickerSelect
@@ -9,7 +9,7 @@ const Picker = ({onchange, tipo}) => {
               width:'100%'
           }}
           selectedValue={tipo}
-          onValueChange={(valor)=>onchange(valor)}
+          onValueChange={(valor)=>onChange(valor)}
           >
              <RNPickerSelect.Item
             label="receita" value="receita"/>
