@@ -1,4 +1,5 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
+import firebase from '../../services/firebaseConnection'
 import { AuthContext } from '../../contexts/auth'
 import Header from '../../components/Header'
 import HistoricoList from '../../components/HistoricoList';
@@ -10,27 +11,51 @@ import {
   Title,
   List
 } from './styles'
+import { format } from 'date-fns'
 import { useState } from 'react/cjs/react.development';
 const Home = () => {
-  const [historico, setHistorico] = useState([
-    {key:'1', tipo:'receita', valor:100},
-    {key:'2', tipo:'despesa', valor:101},
-    {key:'3', tipo:'receita', valor:102},
-  ])
+  const [historico, setHistorico] = useState([])
+  const [saldo, setSaldo] = useState(0)
   const { user } = useContext(AuthContext)
+  const uid = user && user.uid
+
+  useEffect(() => {
+    async function loadList() {
+      await firebase.database().ref('users').child(uid).on('value', (snapshot) => {
+        setSaldo(snapshot.val().saldo); //exibe o saldo
+      });
+      await firebase.database().ref('historico') //exibe o historico ordenado pela data
+        .child(uid)
+        .orderByChild('date').equalTo(format(new Date(), 'dd/MM/yy'))
+        .limitToLast(10).on('value',(snapshot)=>{
+            setHistorico([]);
+            snapshot.forEach((childItem)=>{
+              let list = {
+                key: childItem.key,
+                tipo: childItem.val().tipo,
+                valor: childItem.val().valor
+              }
+              setHistorico(oldarray=>[...oldarray, list].reverse())
+            })
+        })
+      }
+    loadList()
+  }, [])
+
+
   return (
     <Background>
       <Header />
       <Container>
         <Nome>{user && user.nome}</Nome>
-        <Saldo>0</Saldo>
+        <Saldo>R${saldo.toFixed(2)}</Saldo>
       </Container>
       <Title>movimentações</Title>
       <List
-      showsVerticalScrollIndicator={false}
-      data={historico}
-      keyExtractor={item => item.key}
-      renderItem={({item})=>(<HistoricoList data={item}/>)}/>
+        showsVerticalScrollIndicator={false}
+        data={historico}
+        keyExtractor={item => item.key}
+        renderItem={({ item }) => (<HistoricoList data={item} />)} />
     </Background>
   )
 }
