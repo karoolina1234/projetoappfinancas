@@ -1,5 +1,5 @@
-import React, {useState, useContext} from 'react';
-import { View, Text } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { ActivityIndicator } from 'react-native';
 import {
   Background, Container,
   Logo, AreaInput, Input, SubmitButton, SubmitText, Link, LinkText
@@ -13,12 +13,12 @@ function SignIn() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const { signIn } = useContext(AuthContext)
+  const { signIn, loadingAuth } = useContext(AuthContext)
 
-  function handleLogin(){
+  function handleLogin() {
     signIn(email, password);
   }
-  
+
   return (
     <Background>
       <Container>
@@ -29,7 +29,7 @@ function SignIn() {
             autoCorrect={false}
             autoCapitalize="none"
             value={email}
-            onChangeText = {(text) => setEmail(text)}
+            onChangeText={(text) => setEmail(text)}
           />
         </AreaInput>
         <AreaInput>
@@ -38,15 +38,20 @@ function SignIn() {
             autoCorrect={false}
             autoCapitalize="none"
             value={password}
-            onChangeText={(text)=> setPassword(text)}
+            onChangeText={(text) => setPassword(text)}
           />
         </AreaInput>
         <SubmitButton onPress={handleLogin} >
-          <SubmitText>
-            Acessar
-          </SubmitText>
+          {loadingAuth ? (
+            <ActivityIndicator size={20}
+              color="#FFF" />
+          ) : (
+            <SubmitText>
+              Acessar
+            </SubmitText>
+          )}
         </SubmitButton>
-        <Link onPress={()=>navigation.navigate('SignUp')}>
+        <Link onPress={() => navigation.navigate('SignUp')}>
           <LinkText>Criar uma conta</LinkText>
         </Link>
       </Container>

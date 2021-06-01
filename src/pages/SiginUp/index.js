@@ -1,5 +1,5 @@
-import React, {useState, useContext} from 'react';
-import { View, Text } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { ActivityIndicator } from 'react-native';
 import {
   Background, Container,
   Logo, AreaInput, Input, SubmitButton, SubmitText, Link, LinkText
@@ -12,9 +12,9 @@ function SignUp() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const { signUp } = useContext(AuthContext);
+  const { signUp, loadingAuth } = useContext(AuthContext);
 
-  function handleSignUp(){
+  function handleSignUp() {
     signUp(email, password, nome);
   }
   return (
@@ -26,7 +26,7 @@ function SignUp() {
             autoCorrect={false}
             autoCapitalize="none"
             value={nome}
-            onChangeText = {(text) => setNome(text)}
+            onChangeText={(text) => setNome(text)}
           />
         </AreaInput>
         <AreaInput>
@@ -35,7 +35,7 @@ function SignUp() {
             autoCorrect={false}
             autoCapitalize="none"
             value={email}
-            onChangeText = {(text) => setEmail(text)}
+            onChangeText={(text) => setEmail(text)}
           />
         </AreaInput>
         <AreaInput>
@@ -44,13 +44,17 @@ function SignUp() {
             autoCorrect={false}
             autoCapitalize="none"
             value={password}
-            onChangeText={(text)=> setPassword(text)}
+            onChangeText={(text) => setPassword(text)}
           />
         </AreaInput>
         <SubmitButton onPress={handleSignUp}>
-          <SubmitText>
-            Cadastrar
-          </SubmitText>
+          {loadingAuth ? <ActivityIndicator size={20} color="#FFF" /> :
+            (
+              <SubmitText>
+                Cadastrar
+              </SubmitText>
+            )}
+
         </SubmitButton>
       </Container>
     </Background>
