@@ -39,6 +39,7 @@ function SignIn() {
             autoCapitalize="none"
             value={password}
             onChangeText={(text) => setPassword(text)}
+            secureTextEntry={true}
           />
         </AreaInput>
         <SubmitButton onPress={handleLogin} >
