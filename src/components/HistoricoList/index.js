@@ -7,8 +7,10 @@ import {
   TipoText,
   ValorText
 } from './styles'
-function HistoricoList({data}) {
+import {TouchableWithoutFeedback} from 'react-native'
+function HistoricoList({data, deleteItem}) {
   return (
+  <TouchableWithoutFeedback onLongPress={()=>deleteItem(data)}>
     <Container>
       <Tipo>
         <IconView tipo={data.tipo}>
@@ -20,8 +22,10 @@ function HistoricoList({data}) {
           </TipoText>
         </IconView>
       </Tipo>
-      <ValorText>{data.valor}</ValorText>
+      <ValorText>{data.valor} - {data.date}</ValorText>
     </Container>
+  </TouchableWithoutFeedback>
+    
   )
 }
 
