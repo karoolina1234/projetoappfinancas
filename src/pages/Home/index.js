@@ -9,17 +9,23 @@ import {
   Nome,
   Saldo,
   Title,
+  Area,
   List
 } from './styles'
-import { Alert } from 'react-native'
+import { Alert, Platform, TouchableOpacity } from 'react-native'
 import { format, isPast } from 'date-fns'
+import Icon from 'react-native-vector-icons/MaterialIcons'
 import { useState } from 'react/cjs/react.development';
+import DatePicker from '../../components/DatePicker'
+import { onChange } from 'react-native-reanimated';
+
 const Home = () => {
   const [historico, setHistorico] = useState([])
   const [saldo, setSaldo] = useState(0)
   const { user } = useContext(AuthContext)
   const uid = user && user.uid
-
+  const [newDate, setNewDate] = useState(new Date())
+  const [show, setShow] = useState(false)
   useEffect(() => {
     async function loadList() {
       await firebase.database().ref('users').child(uid).on('value', (snapshot) => {
@@ -27,7 +33,7 @@ const Home = () => {
       });
       await firebase.database().ref('historico') //exibe o historico ordenado pela data
         .child(uid)
-        .orderByChild('date').equalTo(format(new Date(), 'dd/MM/yy'))
+        .orderByChild('date').equalTo(format(newDate, 'dd/MM/yy'))
         .limitToLast(10).on('value', (snapshot) => {
           setHistorico([]);
           snapshot.forEach((childItem) => {
@@ -42,7 +48,7 @@ const Home = () => {
         })
     }
     loadList()
-  }, [])
+  }, [newDate])
 
   function handleDelete(data) {
     Alert.alert(
@@ -77,7 +83,18 @@ const Home = () => {
 
   }
 
+  function handleShowPicker() { 
+    setShow(true)
+  }
+  function handleClose(){
+    setShow(false)
+  }
 
+  const onChange = (date)=>{
+    setShow(Platform.OS === 'ios');
+    setNewDate(date);
+    console.log(date)
+  }
   return (
     <Background>
       <Header />
@@ -85,12 +102,27 @@ const Home = () => {
         <Nome>{user && user.nome}</Nome>
         <Saldo>R${saldo.toFixed(2)}</Saldo>
       </Container>
-      <Title>movimentações</Title>
+      <Area>
+        <TouchableOpacity onPress={handleShowPicker}>
+          <Icon name='event' color="#fff" size={30} />
+        </TouchableOpacity>
+        <Title>movimentações</Title>
+      </Area>
+
       <List
         showsVerticalScrollIndicator={false}
         data={historico}
         keyExtractor={item => item.key}
         renderItem={({ item }) => (<HistoricoList data={item} deleteItem={handleDelete} />)} />
+
+
+        {show && (
+          <DatePicker
+          onClose={handleClose}
+          date={newDate}
+          onChange={onChange}
+          />
+        )}
     </Background>
   )
 }
